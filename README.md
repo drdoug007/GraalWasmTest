@@ -39,13 +39,13 @@ This command will:
 
 ## Running the Application
 
-To execute the Java application and see the ASCII art output from the Wasm module, use the following Maven command:
+To execute the Spring Boot application and see the ASCII art output from the Wasm module, use the following Maven command:
 
 ```bash
-mvn exec:exec@run-app
+mvn spring-boot:run
 ```
 
-This command is configured to pass the necessary JVM flags (like `--enable-native-access=ALL-UNNAMED`) to support GraalVM Polyglot features.
+This command is configured to pass the necessary JVM flags (like `--enable-native-access=ALL-UNNAMED`) via the `spring-boot-maven-plugin` to support GraalVM Polyglot features.
 
 ## Technical Details
 
