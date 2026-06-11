@@ -3,10 +3,9 @@ package one.dastech;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -16,12 +15,14 @@ import java.util.List;
 public class ApiController {
 
     private final AsciiArtService asciiArtService;
+    private final MarkdownService markdownService;
 
     @Value("${app.asciiart.valid-fonts}")
     private List<String> validFonts;
 
-    public ApiController(AsciiArtService asciiArtService) {
+    public ApiController(AsciiArtService asciiArtService, MarkdownService markdownService) {
         this.asciiArtService = asciiArtService;
+        this.markdownService = markdownService;
     }
 
     @GetMapping(path="asciiart")
@@ -42,5 +43,15 @@ public class ApiController {
         }
 
         return asciiArtService.generateAsciiArt(text, font);
+    }
+
+    @PostMapping(value = "/markdown", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> renderMarkdown(@RequestBody String markdownBody) {
+        if (markdownBody == null || markdownBody.trim().isEmpty()) {
+            return ResponseEntity.ok("<!-- Empty Markdown Content Provided -->");
+        }
+
+        String htmlResult = markdownService.toHtml(markdownBody);
+        return ResponseEntity.ok(htmlResult);
     }
 }

@@ -1,0 +1,22 @@
+###
+GET http://localhost:8080/api?message=dewd
+
+###
+GET http://localhost:8080/api/asciiart?
+    text="Go SpringBoot!!!"
+
+###
+GET http://localhost:8080/api/asciiart?font=slant&text="Go SpringBoot!!!"
+
+###
+GET http://localhost:8080/api/asciiart?font=shadow&text="Go SpringBoot!!!"
+
+###
+GET http://localhost:8080/api/asciiart?font=doom&text="Go SpringBoot!!!"
+
+
+###
+POST http://localhost:8080/api/markdown
+Content-Type: text/plain
+
+< ./document.md
