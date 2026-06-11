@@ -1,11 +1,13 @@
 package one.dastech;
 
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -15,28 +17,30 @@ public class ApiController {
 
     private final AsciiArtService asciiArtService;
 
-    private static final List<String> VALID_FONTS = List.of("slant", "standard", "shadow");
+    @Value("${app.asciiart.valid-fonts}")
+    private List<String> validFonts;
 
     public ApiController(AsciiArtService asciiArtService) {
         this.asciiArtService = asciiArtService;
     }
 
-    @GetMapping("asciiart")
-    public ResponseEntity<?> getAsciiArt(@RequestParam(name = "text")String text, @RequestParam(name = "font", required = false) String font) {
+    @GetMapping(path="asciiart")
+    public String getAsciiArt(
+            @RequestParam(name = "text") String text,
+            @RequestParam(name = "font", required = false) String font) {
+
+        if (text == null || text.trim().isEmpty()) {
+            return ""; // Keeps the display block completely clean if text is deleted
+        }
+
         if (font == null || font.isEmpty()) {
             font = "standard";
         }
 
-        if (!VALID_FONTS.contains(font)) {
-            return ResponseEntity.badRequest().body(java.util.Map.of(
-                    "error", "Invalid Font Choice",
-                    "message", "Supported options are: " + VALID_FONTS
-            ));
+        if (!validFonts.contains(font)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Font is invalid.");
         }
 
-        String artResult = asciiArtService.generateAsciiArt(text, font);
-        return ResponseEntity.ok()
-                .contentType(org.springframework.http.MediaType.TEXT_PLAIN)
-                .body(artResult);
+        return asciiArtService.generateAsciiArt(text, font);
     }
 }

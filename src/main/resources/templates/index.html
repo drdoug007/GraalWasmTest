@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WASM ASCII Art Generator</title>
+    <script src="/webjars/htmx.org/2.0.0/dist/htmx.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .control-panel {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        input[type="text"], select {
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            color: #fff;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+        }
+        input[type="text"] { flex-grow: 1; }
+        select { min-width: 180px; }
+
+        /* The container holding your GraalWasm generated output string */
+        #preview-display {
+            background-color: #020617;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14px;
+            line-height: 1.2;
+            color: #38bdf8; /* Sleek retro cyan text */
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+
+<h1>WASM ASCII Art Studio</h1>
+<p>Type text below to stream live computations out of the Go WebAssembly runtime.</p>
+
+<!-- Form container syncing both input triggers to the exact same REST request -->
+<div class="control-panel">
+    <input type="text"
+           name="text"
+           placeholder="Type something here..."
+           value="Go SpringBoot!"
+           hx-get="/api/asciiart"
+           hx-include="[name='font']"
+           hx-target="#preview-display"
+           hx-trigger="keyup[target.value.length>0], changed, load">
+
+    <select name="font"
+            hx-get="/api/asciiart"
+            hx-include="[name='text']"
+            hx-target="#preview-display"
+            hx-trigger="change">
+        <option th:each="f : ${fonts}" th:value="${f}" th:text="${f}" th:selected="${f == 'standard'}"></option>
+    </select>
+</div>
+
+<!-- The target fragment container where the ASCII text renders instantly -->
+<pre id="preview-display">Loading initial preview...</pre>
+
+</body>
+</html>
